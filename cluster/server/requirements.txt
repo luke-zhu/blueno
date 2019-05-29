@@ -1,0 +1,14 @@
+# Keep in-sync w/ dev-requirements.txt
+azure-storage==0.36.0
+Flask==1.0.2
+Flask-JWT-Extended==3.17.0
+gevent==1.4.0
+google-cloud-storage==1.13.0
+gunicorn==19.9.0
+kubernetes==9.0.0
+numpy==1.16.1
+paramiko==2.4.2
+Pillow==5.4.1
+psycopg2==2.7.6.1
+redis==3.2.0
+rq==0.13.0

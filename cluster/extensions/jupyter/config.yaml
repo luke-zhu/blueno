@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blueno-jupyter
+spec:
+  selector:
+    matchLabels:
+      app: blueno-jupyter
+  template:
+    metadata:
+      labels:
+        app: blueno-jupyter
+    spec:
+      containers:
+        - name: blueno-jupyter
+          image: ufoym/deepo:all-py36-jupyter-cpu
+          command:
+            - jupyter
+          args:
+            - notebook
+            - "--ip=0.0.0.0"
+            - "--no-browser"
+            - "--allow-root"
+            - "/var/lib/blueno-nfs"
+          volumeMounts:
+            - mountPath: "/var/lib/blueno-nfs"
+              name: nfs
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: blueno-nfs

@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blueno-worker
+spec:
+  selector:
+    matchLabels:
+      app: blueno-worker
+  template:
+    metadata:
+      labels:
+        app: blueno-worker
+    spec:
+      initContainers:
+        - name: wait-for-task-queue
+          image: redis:5.0
+          command:
+            - "sh"
+            - "-c"
+            - "until timeout 5 redis-cli -h blueno-task-queue ping; do echo waiting for redis task queue; done;"
+      containers:
+        - name: blueno-worker
+          # Keep the image name in-sync with the k8s config files
+          image: cyclotomic/blueno-server
+          command:
+            - "rq"
+          args:
+            - "worker"
+            - "--url=redis://blueno-task-queue" # keep in sync w/ name of the blueno-task-queue service
+          imagePullPolicy: Always
+          # Keep env vars in-sync with the other k8s config files
+          env:
+            - name: REDIS_HOST
+              value: blueno-task-queue
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /etc/gcs/storage.json
+            - name: FILESYSTEM_STORE_ROOT
+              value: /var/lib/blueno-nfs
+          envFrom:
+            - secretRef:
+                name: blueno-db
+            - secretRef:
+                name: blueno-server-jwt
+            - secretRef:
+                name: blueno-storage-azure
+                optional: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 600Mi
+          volumeMounts:
+            - mountPath: /etc/gcs
+              name: gcs
+            - mountPath: /var/lib/blueno-nfs
+              name: nfs
+      volumes:
+        - name: gcs
+          secret:
+            secretName: blueno-storage-gcs
+            optional: true
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: blueno-nfs
+  strategy:
+    type: Recreate

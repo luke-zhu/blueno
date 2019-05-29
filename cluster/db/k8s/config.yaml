@@ -1,0 +1,21 @@
+# Use this secret in other services to connect to the
+apiVersion: v1
+kind: Secret
+metadata:
+  name: blueno-db
+stringData:
+  POSTGRES_DB: blueno
+  POSTGRES_USER: blueno
+  POSTGRES_PASSWORD: YOUR_PASSWORD_HERE # You should replace this. See the Makefile for an example of how to with 'sed'.
+  POSTGRES_HOST: blueno-db # Keep in-sync with the service name
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: blueno-db
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 32Gi

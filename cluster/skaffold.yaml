@@ -1,0 +1,32 @@
+apiVersion: skaffold/v1beta11
+kind: Config
+build:
+  artifacts:
+    - image: cyclotomic/blueno-server-dev
+      context: ./server/
+      docker:
+        dockerfile: docker/dev/Dockerfile
+      sync:
+        manual:
+          - src: app/**/*
+            dest: /src
+          - src: src/**/*
+            dest: /src
+# Uncomment the 2 blocks below if you are developing without the other
+# applications running
+#    - image: cyclotomic/blueno-server
+#      context: ./server/
+#      docker:
+#        dockerfile: docker/prod/Dockerfile
+#      sync:  # Avoid rebuilding if inessential files change
+#        'src/*': server/src/
+#        'app/routes/*': server/app/routes/
+deploy:
+  kubectl:
+    manifests:
+      - server/k8s/server-dev.yaml
+#      - server/k8s/task-queue.yaml
+#      - server/k8s/secrets.yaml
+#      - server/k8s/worker.yaml
+#      - db/k8s/app.yaml
+#      - db/k8s/config.yaml

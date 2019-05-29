@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blueno-server-dev
+spec:
+  selector:
+    matchLabels:
+      app: blueno-server-dev
+  template:
+    metadata:
+      labels:
+        app: blueno-server-dev
+    spec:
+      serviceAccountName: blueno-server
+      initContainers:
+        - name: wait-for-task-queue
+          image: debian:9
+          command:
+            - "sleep"
+          args:
+            - "30"
+        - name: init-db
+          # Keep the image name in-sync with the k8s config files
+          image: cyclotomic/blueno-server
+          imagePullPolicy: Always
+          command:
+            - "python"
+          args:
+            - "cli.py"
+            - "init_db"
+          envFrom:
+            - secretRef:
+                name: blueno-db
+      containers:
+        - name: blueno-server-dev
+          image: cyclotomic/blueno-server-dev
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+            - containerPort: 5001
+          # Keep env vars in-sync with the other k8s config files
+          env:
+            - name: REDIS_HOST
+              value: blueno-task-queue
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /etc/gcs/storage.json
+            - name: FILESYSTEM_STORE_ROOT
+              value: /var/lib/blueno-nfs
+          envFrom:
+            - secretRef:
+                name: blueno-db
+            - secretRef:
+                name: blueno-server-jwt
+            - secretRef:
+                name: blueno-storage-azure
+                optional: true
+          resources:
+            requests:
+              cpu: 0m
+              memory: 70Mi
+          volumeMounts:
+            - mountPath: /etc/gcs
+              name: gcs
+            - mountPath: /var/lib/blueno-nfs
+              name: nfs
+      volumes:
+        - name: gcs
+          secret:
+            secretName: blueno-storage-gcs
+            optional: true
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: blueno-nfs

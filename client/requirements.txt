@@ -1,0 +1,2 @@
+# Keep in-sync w/ dev-requirements.txt
+requests==2.22.0

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blueno-jupyter-gpu
+spec:
+  selector:
+    matchLabels:
+      app: blueno-jupyter-gpu
+  template:
+    metadata:
+      labels:
+        app: blueno-jupyter-gpu
+    spec:
+      containers:
+        - name: blueno-jupyter-gpu
+          image: ufoym/deepo:all-py36-jupyter
+          command:
+            - jupyter
+          args:
+            - notebook
+            - "--ip=0.0.0.0"
+            - "--no-browser"
+            - "--allow-root"
+            - "/var/lib/blueno-nfs"
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          volumeMounts:
+            - mountPath: "/var/lib/blueno-nfs"
+              name: nfs
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: blueno-nfs

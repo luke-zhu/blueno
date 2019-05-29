@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: blueno-task-queue # name referenced by server and worker
+spec:
+  ports:
+    - port: 6379
+  selector:
+    app: blueno-task-queue
+  type: NodePort
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: blueno-task-queue
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blueno-task-queue
+spec:
+  selector:
+    matchLabels:
+      app: blueno-task-queue
+  template:
+    metadata:
+      labels:
+        app: blueno-task-queue
+    spec:
+      containers:
+        - name: blueno-task-queue
+          image: redis:5.0
+          command:
+            - "redis-server"
+          args:
+            - "--appendonly"
+            - "yes"
+            - "--dir"
+            - "/var/lib/redis"
+          resources:
+            requests:
+              cpu: 0m
+          volumeMounts:
+            - mountPath: /var/lib/redis
+              name: redis
+      volumes:
+        - name: redis
+          persistentVolumeClaim:
+            claimName: blueno-task-queue
+  strategy:
+    type: Recreate

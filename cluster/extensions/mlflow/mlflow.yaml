@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mlflow
+spec:
+  ports:
+    - port: 80
+      targetPort: 5000
+  selector:
+    app: mlflow
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlflow
+spec:
+  selector:
+    matchLabels:
+      app: mlflow
+  template:
+    metadata:
+      labels:
+        app: mlflow
+    spec:
+      containers:
+        - name: mlflow
+          image: "cyclotomic/mlflow"
+          imagePullPolicy: Always
+          env:
+            - name: MLFLOW_DBNAME
+              value: mlflow
+            - name: MLFLOW_ARTIFACT_ROOT
+              value: /var/lib/blueno-nfs/mlflow
+          envFrom:
+            - secretRef:
+                name: blueno-db
+          volumeMounts:
+            - mountPath: /var/lib/blueno-nfs
+              name: nfs
+          resources:
+            requests:
+              cpu: 0m
+              memory: 300Mi
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: blueno-nfs
+

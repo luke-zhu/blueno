@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cronjobs
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: cronjobs
+subjects:
+- kind: ServiceAccount
+  name: cronjobs
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: morning-scale-up
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          nodeSelector:
+            beta.kubernetes.io/instance-type: g1-small
+          containers:
+            - name: morning-scale-up
+              image: cyclotomic/gke-downscale
+              imagePullPolicy: Always
+              command:
+                - "python"
+              args:
+                - "cronjobs.py"
+                - "morning"
+              env:
+                - name: GOOGLE_APPLICATION_CREDENTIALS
+                  value: /etc/gke/gke.json
+              volumeMounts:
+                - mountPath: /etc/gke
+                  name: gke
+          restartPolicy: OnFailure
+          volumes:
+            - name: gke
+              secret:
+                secretName: gke-service-account
+          serviceAccountName: cronjobs
+  schedule: 0 8 * * *
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: night-scale-down
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          nodeSelector:
+            beta.kubernetes.io/instance-type: g1-small
+          containers:
+            - name: night-scale-down
+              image: cyclotomic/gke-downscale
+              imagePullPolicy: Always
+              command:
+                - "python"
+              args:
+                - "cronjobs.py"
+                - "night"
+              env:
+                - name: GOOGLE_APPLICATION_CREDENTIALS
+                  value: /etc/gke/gke.json
+              volumeMounts:
+                - mountPath: /etc/gke
+                  name: gke
+          restartPolicy: OnFailure
+          volumes:
+            - name: gke
+              secret:
+                secretName: gke-service-account
+          serviceAccountName: cronjobs
+  schedule: 0 17 * * *

@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: metabase
+  labels:
+    app: metabase
+spec:
+  ports:
+    - port: 80
+      targetPort: 3000
+  selector:
+    app: metabase
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metabase
+  labels:
+    app: metabase
+spec:
+  selector:
+    matchLabels:
+      app: metabase
+  template:
+    metadata:
+      labels:
+        app: metabase
+    spec:
+      containers:
+        - name: metabase
+          image: metabase/metabase
+          ports:
+            - containerPort: 3000
+              name: metabase
+          env:
+            - name: MB_DB_TYPE
+              value: postgres
+            - name: MB_DB_DBNAME
+              valueFrom:
+                secretKeyRef:
+                  name: blueno-db
+                  key: POSTGRES_DB
+            - name: MB_DB_PORT
+              value: "5432"
+            - name: MB_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: blueno-db
+                  key: POSTGRES_USER
+            - name: MB_DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: blueno-db
+                  key: POSTGRES_PASSWORD
+            - name: MB_DB_HOST
+              value: blueno-db
+          resources:
+            requests:
+              cpu: 0m
+              memory: 500Mi
