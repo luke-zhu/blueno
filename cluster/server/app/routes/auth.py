@@ -83,7 +83,8 @@ def setup():
         })
     elif flask.request.method == 'POST':
         if user_count > 0:
-            return flask.jsonify({'message': "A user was already created"}), 400
+            return flask.jsonify(
+                {'message': "A user was already created"}), 400
 
         # Payload validation copied from /login
         if not flask.request.is_json:

@@ -2,8 +2,6 @@ import logging
 import sys
 import time
 
-from google.api_core.exceptions import FailedPrecondition
-from google.cloud import container_v1
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 

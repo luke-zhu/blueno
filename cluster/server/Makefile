@@ -17,8 +17,7 @@ pod := $(shell kubectl get pods -o custom-columns=:metadata.name --field-selecto
 shell:
 	kubectl exec -it $(pod) -- /bin/bash
 
-env_vars := ""
-
+env_vars := FILESYSTEM_STORE_ROOT=test_data_dir
 # Test the server locally without docker
 test:
 	${env_vars} pytest --cov=app --cov-report html app/
