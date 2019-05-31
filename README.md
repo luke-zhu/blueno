@@ -23,18 +23,13 @@ _The dataset registration form and the UI for viewing the images_
 _The setup scripts set up Postgres to store metadata and
  NFS to store image data. All applications run on Kubernetes._
 
-This may seem like over-engineering, but any team which plans on productionizing a model
-or retraining at a later date will face problems with data versioning and model reproducibility.
-Having these tools set up early on will mitigate those issues.
+This may seem like over-engineering, but it mitigates data problems in the field which are estimated to take [80%](https://www.infoworld.com/article/3228245/the-80-20-data-science-dilemma.html) or even
+[90%](https://www.technologyreview.com/s/612897/this-is-why-ai-has-yet-to-reshape-most-businesses/) of a ML practitioner’s time.
+If you hope to deploy a deep learning model, this would still not be enough. In that case, you'd want eventually add or move on to some of tools listed in [Why is this a "gateway" tool?](#why-is-this-a-gateway-tool)
 
-In addition, if you need to collaborate with others, having data stored in NFS and
-an easy way to set up an experiment tracking tool can make your team more productive.
-See the answers to [Why did we include NFS?](#Why-did-we-include-NFS) and [Why is an experiment tracking tool useful?](#Why-is-an-experiment-tracking-tool-useful)
-for why this is the case.
 
-Finally, training models with Kubernetes can actually be cheaper than provisioning cloud VMs yourself.
-If you were to run multiple training jobs overnight, Kubernetes would run multiple jobs
-on the same node, if possible, and downscale when the jobs are over.
+In addition, Docker, Kubernetes, NFS, and Postgres make your team much more productive.
+See [this doc](TECHNICAL_WHY.md) for a more technical discussion on the problems Blueno addresses.
 
 # Table of Contents
 - [Installation](#installation)
@@ -52,7 +47,7 @@ To install them on MacOS, run
 brew install kubernetes-cli kubernetes-helm
 ```
 
-See [install-kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) and [helm/install.md](https://github.com/helm/helm/blob/master/docs/install.md) for
+See the [kubectl installation guide](https://kubernetes.io/docs/tasks/tools/install-kubectl/) and the [Helm installation guide](https://github.com/helm/helm/blob/master/docs/install.md) for
 more installation information.
 
 If you want to use Google Kubernetes Engine, make sure you have `gcloud` [installed](https://cloud.google.com/sdk/install) and run:
@@ -207,39 +202,4 @@ Blueno is not a good choice if:
 - Your organization already supplies you with strong ML infrastructure. 
 - You are not working on the cloud and don't have any plans to in the future.
 
-### Why did we include a web UI?
-
-This tool originated from project to apply deep learning on CT images. We
-did a lot of 3D-to-2D preprocessing and found that visualizing the data
-helped us improve our models a lot.
-
-In addition, we anticipated that others working with real-world data would also face data integrity
-issues. A tool to simply view the data would make it easy to eliminate many classes of data errors.
-
-### Why did we include NFS?
-
-Two fairly common alternatives for storing image data when working on the public cloud
-are disk storage and object storage.
-
-The issue with disk storage is that, generally, you can only attach a disk
-to one VM. This means that if you want to run more training jobs than the number of
-GPUs your instance has, you need to manually work around the problem. It's generally not
-difficult to do but it's fairly time consuming, especially for small teams without
-expertise in this area.
-
-The other common alternative is object storage (S3, etc.). While the data is a lot easier to manage,
-it's generally slower than NFS and requires writing a lot of custom code to download data
-before training a model. (On the positive side, if you are working with Colaboratory,
-it can be nice to have the data on object storage.)
-
-While NFS is not always the greatest option (esp. on top of Kubernetes), it results in
-a much more maintainable setup with good-enough performance. With NFS, we avoid the
-issue of having multiple copies of potentially stale data floating around while
-still being having around 30-50 MB/s throughput.
-
-### Why is an experiment tracking tool useful?
-
-If you run more than 5-10 training jobs (which you likely will), then tracking
-hyperparameters and metrics can help you identify which architectures and hyperparameter configurations work best.
-If you are working on a team, tracking your results (and the code which produced the results)
-can help your group coordinate and avoid reproducibility issues.
+See [this doc](TECHNICAL_WHY.md) for a more technical discussion.
