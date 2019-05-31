@@ -43,10 +43,10 @@ on the same node, if possible, and downscale when the jobs are over.
 
 ## Installation
 
-_Note: These commands were only tested on OS X. They may work on Linux and don't work on Windows_
+_Note: These commands were only tested on MacOS. They may work on Linux and don't work on Windows_
 
 All setup scripts require `kubectl` and `helm`
-To install them on OS X, run
+To install them on MacOS, run
 
 ```
 brew install kubernetes-cli kubernetes-helm
@@ -60,7 +60,7 @@ If you want to use Google Kubernetes Engine, make sure you have `gcloud` [instal
 git clone https://github.com/luke-zhu/blueno.git
 cd blueno
 python3 setup/gke.py  # Takes ~10 minutes
-kubectl get pods -w  # Ctrl +C when the blueno-server is RUNNING
+kubectl get pods -w  # Ctrl+C when the blueno-server is RUNNING
 kubectl get svc
 ```
 
@@ -77,7 +77,7 @@ If you want to use Azure Kubernetes Service, make sure you have the Azure CLI (`
 git clone https://github.com/luke-zhu/blueno.git
 cd blueno
 python3 setup/aks.py
-kubectl get pods -w  # Ctrl +C when the blueno-server is RUNNING
+kubectl get pods -w  # Ctrl+C when the blueno-server is RUNNING
 kubectl get svc
 ```
 
@@ -90,7 +90,7 @@ the minikube disk size in `setup/minikube.py`._
 git clone https://github.com/luke-zhu/blueno.git
 cd blueno
 python3 setup/minkube.py
-kubectl get pods -w  # Ctrl +C when the blueno-server is RUNNING
+kubectl get pods -w  # Ctrl+C when the blueno-server is RUNNING
 minikube service blueno-nginx-nginx-ingress-controller
 ```
 
@@ -108,7 +108,7 @@ kubectl port-forward deployment/blueno-jupyter 8888:8888  # port forward the jup
 ```
 
 See the [Kubernetes docs](https://kubernetes.io/docs/) for more details on how to use Kubernetes and
-[cluster/extensions/README.md]([cluster/extensions/README.md]) for commands to deploy notebooks and more
+[cluster/extensions/README.md](cluster/extensions/README.md) for commands to deploy notebooks and more
 
 There is a fairly barebones Python client for interacting with the Blueno server.
 See the `client/` directory for more details
@@ -140,7 +140,7 @@ automatically keep track of the models trained.
 One issue preventing many people from using such tools is that installing the software does not seem to be worth the effort.
 We believe that this tool can encourage ML researchers to use better tooling because
 (1) this tool is (presumably) one of the simplest ways to start training models on a a public image dataset and
-(2) this tool comes with simple examples of how to set up additional ML tools. See [cluster/extensions/README.md]([cluster/extensions/README.md])
+(2) this tool comes with simple examples of how to set up additional ML tools. See [cluster/extensions/README.md](cluster/extensions/README.md)
 for instructions.
 
 Here is a list of open-source tools worth considering:
