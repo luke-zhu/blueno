@@ -1,5 +1,5 @@
 # Keep in sync w/ dev-requirements.txt
-numpy==1.16.1
+numpy==1.22.0
 tensorflow-datasets==1.0.2
 tensorflow==1.13.1
 # Check https://github.com/tensorflow/datasets/blob/master/setup.py when updating tensorflow-datasets
