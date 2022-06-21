@@ -6,7 +6,7 @@ gevent==1.4.0
 google-cloud-storage==1.13.0
 gunicorn==19.9.0
 kubernetes==9.0.0
-numpy==1.16.1
+numpy==1.22.0
 paramiko==2.4.2
 Pillow==5.4.1
 psycopg2==2.7.6.1
